@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "909481794405",
+    "project_id": "electricity-bill-61f26",
+    "storage_bucket": "electricity-bill-61f26.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:909481794405:android:4bb056da36339c9c375f8c",
+        "android_client_info": {
+          "package_name": "com.ayoub.electricitybill"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "909481794405-6obh8bj6gv02bd7frftmjjmjm7noqaqk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDL6auZzcGJGljOwIHYCGUeznQyGLMrMOY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "909481794405-6obh8bj6gv02bd7frftmjjmjm7noqaqk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
