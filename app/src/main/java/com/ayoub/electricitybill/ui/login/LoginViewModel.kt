@@ -2,8 +2,8 @@ package com.ayoub.electricitybill.ui.login
 
 import android.app.Application
 import android.content.Context
-import androidx.lifecycle.ViewModel
 import com.ayoub.electricitybill.base.BaseViewModel
+import com.ayoub.electricitybill.firebase.FirebaseUserAuth
 import com.ayoub.electricitybill.ui.uiState.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -11,6 +11,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val application: Application,
+    private val firebase: FirebaseUserAuth,
 ): BaseViewModel<UiState>() {
     private val context: Context get() = application.applicationContext
 
@@ -19,10 +20,19 @@ class LoginViewModel @Inject constructor(
     }
 
     fun login(
-        username: String,
+        email: String,
         password: String,
     ) {
-
+        _uiState.value = UiState.Loading
+        firebase.login(
+            email, password,
+            onSuccess = {
+                _uiState.value = UiState.Success()
+            },
+            onFail =  {
+                _uiState.value = UiState.Fail()
+            }
+        )
     }
 
 }
