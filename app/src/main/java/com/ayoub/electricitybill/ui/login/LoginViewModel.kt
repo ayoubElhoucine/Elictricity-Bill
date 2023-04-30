@@ -23,6 +23,7 @@ class LoginViewModel @Inject constructor(
         email: String,
         password: String,
     ) {
+        if (_uiState.value is UiState.Loading) return
         _uiState.value = UiState.Loading
         firebase.login(
             email, password,
