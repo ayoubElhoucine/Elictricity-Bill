@@ -2,13 +2,14 @@ package com.ayoub.electricitybill.ui.home
 
 import android.app.Application
 import android.content.Context
-import androidx.lifecycle.ViewModel
+import com.ayoub.electricitybill.base.BaseViewModel
+import com.ayoub.electricitybill.ui.uiState.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val application: Application,
-): ViewModel() {
+): BaseViewModel<UiState>() {
     val context: Context get () = application.applicationContext
 }
