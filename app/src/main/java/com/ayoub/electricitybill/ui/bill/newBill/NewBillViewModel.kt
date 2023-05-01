@@ -27,6 +27,10 @@ class NewBillViewModel @Inject constructor(
     val context: Context get () = application.applicationContext
     private var billImage: String? = null
 
+    init {
+        _uiState.value = UiState.Idle
+    }
+
     fun createDraftBill(name: String, extra: Double) {
         billImage?.let { image ->
             _uiState.value = UiState.Loading
