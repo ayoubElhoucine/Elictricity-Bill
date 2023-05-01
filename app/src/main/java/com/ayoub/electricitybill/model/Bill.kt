@@ -4,6 +4,7 @@ data class Bill(
     val id: String,
     val name: String,
     val image: String,
-    val consumptions: List<String>,
-    val createdAt: Double
+    val extra: Double,
+    val consumptions: List<Consumption>,
+    val createdAt: Double,
 )
