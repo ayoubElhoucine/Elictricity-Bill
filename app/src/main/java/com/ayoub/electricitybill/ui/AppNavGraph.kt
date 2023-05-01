@@ -4,7 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navigation
+import com.ayoub.electricitybill.ui.bill.newBill.NewBillScreen
 import com.ayoub.electricitybill.ui.home.HomeScreen
 import com.ayoub.electricitybill.ui.login.LoginScreen
 import com.ayoub.electricitybill.ui.splash.SplashScreen
@@ -47,8 +47,14 @@ fun AppNavGraph(
         composable(Screens.HOME){
             BackHandler(onBack = appState::popBack)
             HomeScreen(
-                onNewBill = { /*TODO*/ },
+                onNewBill = { appState.navigateTo(Screens.NEW_BILL) },
                 onBillDetails = { /*TODO*/ },
+            )
+        }
+        composable(Screens.NEW_BILL){
+            BackHandler(onBack = appState::popBack)
+            NewBillScreen(
+                onBack = appState::popBack,
             )
         }
     }

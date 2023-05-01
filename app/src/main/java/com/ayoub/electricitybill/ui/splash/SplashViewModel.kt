@@ -11,7 +11,7 @@ import javax.inject.Inject
 class SplashViewModel @Inject constructor(
     private val application: Application,
     private val auth: FirebaseUserAuth,
-): ViewModel(){
+): ViewModel() {
     private val context: Context get() = application.applicationContext
 
     fun getStarted(

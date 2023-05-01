@@ -6,5 +6,5 @@ data class Bill(
     val image: String,
     val extra: Double,
     val consumptions: List<Consumption>,
-    val createdAt: Double,
+    val createdAt: Long,
 )
