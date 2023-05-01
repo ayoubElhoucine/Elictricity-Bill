@@ -9,6 +9,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
+import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import java.io.File
@@ -44,8 +45,8 @@ class FirebaseDatabase @Inject constructor(
     }
 
     fun getDraftBill(
+        onFail: (() -> Unit)? = null,
         onSuccess: (Bill) -> Unit,
-        onFail: () -> Unit,
     ) {
         database.child(draftBillRef).addValueEventListener(object: ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -54,7 +55,7 @@ class FirebaseDatabase @Inject constructor(
                 }
             }
             override fun onCancelled(error: DatabaseError) {
-                onFail()
+                onFail?.invoke()
             }
         })
     }

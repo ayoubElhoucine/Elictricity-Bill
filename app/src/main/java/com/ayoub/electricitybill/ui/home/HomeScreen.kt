@@ -20,8 +20,13 @@ import com.ayoub.electricitybill.ui.uiState.UiState
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     onNewBill: () -> Unit,
-    onBillDetails: () -> Unit,
+    onDraftedBill: () -> Unit,
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.getDraftBill {
+            onDraftedBill()
+        }
+    }
     val uiState = viewModel.uiState.collectAsState()
     Scaffold(
         modifier = Modifier.fillMaxSize(),

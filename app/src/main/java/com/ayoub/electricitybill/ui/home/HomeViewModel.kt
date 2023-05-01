@@ -20,10 +20,10 @@ class HomeViewModel @Inject constructor(
 ): BaseViewModel<UiState>() {
 
     init {
-        getData()
+        getBills()
     }
 
-    private fun getData() {
+    private fun getBills() {
         _uiState.value = UiState.Loading
         firebaseDatabase.getBills(
             onSuccess = {
@@ -33,5 +33,11 @@ class HomeViewModel @Inject constructor(
                 _uiState.value = UiState.Fail()
             }
         )
+    }
+
+    fun getDraftBill(onBillDetails: () -> Unit) {
+        firebaseDatabase.getDraftBill {
+            onBillDetails()
+        }
     }
 }
