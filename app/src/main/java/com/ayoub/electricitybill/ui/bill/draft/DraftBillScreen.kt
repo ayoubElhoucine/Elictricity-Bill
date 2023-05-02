@@ -5,6 +5,7 @@ import android.widget.ScrollView
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -24,12 +25,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.ayoub.electricitybill.R
 import com.ayoub.electricitybill.extension.createImageUri
 import com.ayoub.electricitybill.extension.toNiceFormat
 import com.ayoub.electricitybill.model.Bill
@@ -92,7 +95,7 @@ private fun Success(
             }
             is UiState.Success -> {
                 LazyColumn(
-                    contentPadding = PaddingValues(16.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 20.dp),
                 ) {
                     item {
                         myConsumption.value?.let {
@@ -131,7 +134,6 @@ private fun NewConsumptionView(
     }
 
     Card(
-        modifier = Modifier.padding(16.dp),
         elevation = 10.dp,
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -150,23 +152,43 @@ private fun NewConsumptionView(
             )
             Button(
                 modifier = Modifier.size(90.dp),
-                shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(backgroundColor = Purple700),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                border = BorderStroke(width = 2.dp, color = Purple500),
                 onClick = {
                     cameraImageUri.value = context.createImageUri()
                     cameraImageUri.value?.let {
                         cameraLauncher.launch(it)
                     }
                 },
+                contentPadding = PaddingValues(0.dp)
             ) {
-                when (uploadImageUiState.value) {
-                    UiState.Loading -> CircularProgressIndicator(color = Color.White)
-                    is UiState.Success -> Icon(
-                        modifier = Modifier.size(50.dp),
-                        imageVector = Icons.Filled.Check,
-                        contentDescription = null,
-                        tint = Color.White,
-                    )
+                when (val data = uploadImageUiState.value) {
+                    UiState.Loading -> CircularProgressIndicator()
+                    is UiState.Success -> {
+                        (data.data as? String)?.let {
+                            GlideImage(
+                                modifier = Modifier.fillMaxSize(),
+                                imageModel = it,
+                                contentScale = ContentScale.FillBounds,
+                                contentDescription = null,
+                                loading = {
+                                    Box(modifier = Modifier.fillMaxSize()) {
+                                        CircularProgressIndicator(modifier = Modifier.align(
+                                            Alignment.Center
+                                        ))
+                                    }
+                                }
+                            )
+                        } ?: run {
+                            Icon(
+                                modifier = Modifier.size(50.dp),
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = null,
+                                tint = Color.White,
+                            )
+                        }
+                    }
                     is UiState.Fail -> Icon(
                         modifier = Modifier.size(50.dp),
                         imageVector = Icons.Filled.Close,
@@ -175,13 +197,14 @@ private fun NewConsumptionView(
                     )
                     else -> Icon(
                         modifier = Modifier.size(50.dp),
-                        imageVector = Icons.Filled.Add,
+                        painter = painterResource(id = R.drawable.ic_camera),
                         contentDescription = null,
-                        tint = Color.White,
+                        tint = Purple500,
                     )
                 }
             }
             OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
                 value = counter.value,
                 placeholder = {
                     Text(text = "Compteur")
@@ -191,7 +214,8 @@ private fun NewConsumptionView(
                 },
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Number
-                )
+                ),
+                singleLine = true,
             )
             Button(
                 modifier = Modifier.height(50.dp),
@@ -205,18 +229,23 @@ private fun NewConsumptionView(
                     }
                 },
                 enabled = counter.value.isNotBlank(),
-                shape = CircleShape
+                shape = RoundedCornerShape(8.dp)
             ) {
-                when (createUiState.value) {
-                    UiState.Idle, is UiState.Success -> Text(
-                        text = "Confirmer",
-                        color = Color.White
-                    )
-                    UiState.Loading -> CircularProgressIndicator(
-                        modifier = Modifier.size(30.dp),
-                        color = Color.White
-                    )
-                    else -> Text(text = "Réessayez", color = Color.White)
+                Box(
+                    modifier = Modifier.weight(1f),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    when (createUiState.value) {
+                        UiState.Idle, is UiState.Success -> Text(
+                            text = "Confirmer",
+                            color = Color.White
+                        )
+                        UiState.Loading -> CircularProgressIndicator(
+                            modifier = Modifier.size(30.dp),
+                            color = Color.White
+                        )
+                        else -> Text(text = "Réessayez", color = Color.White)
+                    }
                 }
             }
         }

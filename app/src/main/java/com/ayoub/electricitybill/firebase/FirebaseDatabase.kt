@@ -85,6 +85,12 @@ class FirebaseDatabase @Inject constructor(
             override fun onChildRemoved(snapshot: DataSnapshot) {}
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
         })
+        database.child(billsRef).addValueEventListener(object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (!snapshot.exists()) onFail()
+            }
+            override fun onCancelled(error: DatabaseError) { onFail() }
+        })
     }
 
     fun getBillConsumptions(
@@ -104,6 +110,12 @@ class FirebaseDatabase @Inject constructor(
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
             override fun onChildRemoved(snapshot: DataSnapshot) {}
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onCancelled(error: DatabaseError) { onFail() }
+        })
+        query.addValueEventListener(object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (!snapshot.exists()) onSuccess(emptyList())
+            }
             override fun onCancelled(error: DatabaseError) { onFail() }
         })
     }
