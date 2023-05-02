@@ -63,7 +63,7 @@ class DraftBillViewModel @Inject constructor(
         )
     }
 
-    fun createNewConsumption(counter: Double){
+    fun createNewConsumption(counter: Double, missingImage: () -> Unit){
         (_uiState.value as? UiState.Success)?.let { data ->
             (data.data as? Bill)?.let {bill ->
                 _createUiState.value = UiState.Loading
@@ -91,6 +91,7 @@ class DraftBillViewModel @Inject constructor(
                     }
                 } ?: run {
                     _createUiState.value = UiState.Fail()
+                    missingImage()
                 }
             }
         }

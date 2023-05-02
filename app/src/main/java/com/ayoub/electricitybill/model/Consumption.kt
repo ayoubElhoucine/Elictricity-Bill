@@ -9,5 +9,6 @@ data class Consumption(
     val image: String = "",
     val consumer: String = "",
     val bill: String = "",
+    val payed: Boolean = false,
     val createdAt: Long = 0,
 )

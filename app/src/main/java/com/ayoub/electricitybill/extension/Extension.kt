@@ -20,3 +20,11 @@ fun Context.createImageUri(): Uri {
         file,
     )
 }
+
+fun Double.toNiceFormat(
+    aroundUp: Int = 2,
+    hardDecimal: Boolean = false
+): String {
+    return if (this > this.toInt() || hardDecimal) String.format("%.${aroundUp}f", this)
+    else String.format("%.0f", this)
+}
