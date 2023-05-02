@@ -164,7 +164,7 @@ private fun NewConsumptionView(
                 contentPadding = PaddingValues(0.dp)
             ) {
                 when (val data = uploadImageUiState.value) {
-                    UiState.Loading -> CircularProgressIndicator()
+                    UiState.Loading -> CircularProgressIndicator(strokeWidth = 2.dp)
                     is UiState.Success -> {
                         (data.data as? String)?.let {
                             GlideImage(
@@ -176,7 +176,7 @@ private fun NewConsumptionView(
                                     Box(modifier = Modifier.fillMaxSize()) {
                                         CircularProgressIndicator(modifier = Modifier.align(
                                             Alignment.Center
-                                        ))
+                                        ), strokeWidth = 2.dp)
                                     }
                                 }
                             )
