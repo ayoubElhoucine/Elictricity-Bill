@@ -1,12 +1,14 @@
 package com.ayoub.electricitybill.ui.bill.draft
 
 import android.net.Uri
+import android.widget.ScrollView
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -18,10 +20,13 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -32,6 +37,7 @@ import com.ayoub.electricitybill.model.Consumption
 import com.ayoub.electricitybill.ui.theme.Purple500
 import com.ayoub.electricitybill.ui.theme.Purple700
 import com.ayoub.electricitybill.ui.uiState.UiState
+import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun DraftBillScreen(
@@ -40,17 +46,34 @@ fun DraftBillScreen(
 ) {
     val uiState = viewModel.uiState.collectAsState()
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        when (val data = uiState.value) {
-            UiState.Loading -> CircularProgressIndicator()
-            is UiState.Success -> {
-                (data.data as? Bill)?.let { bill ->
-                    Success(viewModel = viewModel, bill = bill)
-                }
+    Scaffold(
+        topBar = {
+            TopAppBar {
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = "Nouvelle facture",
+                    textAlign = TextAlign.Center,
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.W600
+                )
             }
-            else -> LaunchedEffect(Unit) { onBack() }
+        }
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it),
+        ) {
+            when (val data = uiState.value) {
+                UiState.Loading -> CircularProgressIndicator()
+                is UiState.Success -> {
+                    (data.data as? Bill)?.let { bill ->
+                        Success(viewModel = viewModel, bill = bill)
+                    }
+                }
+                else -> LaunchedEffect(Unit) { onBack() }
+            }
         }
     }
 }
@@ -63,13 +86,23 @@ private fun Success(
     val conUiState = viewModel.conUiState.collectAsState()
     val myConsumption = viewModel.myConsumption.collectAsState()
     Column {
-        when (conUiState.value) {
-            UiState.Loading -> CircularProgressIndicator()
+        when (val data = conUiState.value) {
+            UiState.Loading -> Box(modifier = Modifier.fillMaxSize()) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
             is UiState.Success -> {
-                myConsumption.value?.let {
-                    ConsumptionDetailsView(it, bill.extra)
-                } ?: run {
-                    NewConsumptionView(viewModel = viewModel)
+                LazyColumn(
+                    contentPadding = PaddingValues(16.dp),
+                ) {
+                    item {
+                        myConsumption.value?.let {
+                            ConsumptionDetailsView(it, bill.extra)
+                        } ?: run {
+                            NewConsumptionView(viewModel = viewModel)
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        BillInfoView(bill = bill, consumptions = data.data as? List<Consumption>)
+                    }
                 }
             }
             else -> Unit
@@ -196,7 +229,6 @@ private fun ConsumptionDetailsView(
     extra: Double?,
 ) {
     Card(
-        modifier = Modifier.padding(16.dp),
         elevation = 10.dp,
         shape = RoundedCornerShape(12.dp),
     ) {
@@ -278,6 +310,43 @@ private fun ConsumptionDetailsView(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun BillInfoView(
+    bill: Bill,
+    consumptions: List<Consumption>?,
+) {
+    Card(
+        elevation = 10.dp,
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 20.dp, horizontal = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+        ) {
+            Text(
+                modifier = Modifier.padding(bottom = 10.dp),
+                text = "Details de facture",
+                color = Color.Black,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.W600,
+            )
+            ConsumptionDetailsViewItem(
+                title = "Facture",
+                value = bill.name
+            )
+            GlideImage(
+                modifier = Modifier.clip(RoundedCornerShape(8.dp)),
+                imageModel = bill.image,
+                contentDescription = null,
+                contentScale = ContentScale.FillWidth,
+            )
         }
     }
 }
