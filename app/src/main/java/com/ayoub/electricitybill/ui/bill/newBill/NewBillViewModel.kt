@@ -39,7 +39,6 @@ class NewBillViewModel @Inject constructor(
                 name = name,
                 extra = extra,
                 image = image,
-                consumptions = listOf(),
                 createdAt = System.currentTimeMillis()
             )
             firebaseDatabase.createDraftBill(

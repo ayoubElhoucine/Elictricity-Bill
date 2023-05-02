@@ -3,21 +3,18 @@ package com.ayoub.electricitybill.firebase
 import android.app.Application
 import android.net.Uri
 import com.ayoub.electricitybill.model.Bill
+import com.ayoub.electricitybill.model.Consumption
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
-import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
 const val billsRef = "bills"
 const val draftBillRef = "draftBill"
+const val consumptionsRef = "consumptions"
 
 @Singleton
 class FirebaseDatabase @Inject constructor(
@@ -37,6 +34,15 @@ class FirebaseDatabase @Inject constructor(
 
     fun createNewBill(bill: Bill, onSuccess: () -> Unit, onFail: () -> Unit) {
         database.child(billsRef).push().setValue(bill)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener {
+                FirebaseCrashlytics.getInstance().recordException(it)
+                onFail()
+            }
+    }
+
+    fun createNewConsumption(consumption: Consumption, onSuccess: () -> Unit, onFail: () -> Unit) {
+        database.child(consumptionsRef).push().setValue(consumption)
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener {
                 FirebaseCrashlytics.getInstance().recordException(it)
@@ -81,11 +87,52 @@ class FirebaseDatabase @Inject constructor(
         })
     }
 
+    fun getBillConsumptions(
+        id: String,
+        onSuccess: (List<Consumption>) -> Unit,
+        onFail: () -> Unit,
+    ){
+        val query: Query = database.child(consumptionsRef).orderByChild("bill").equalTo(id)
+        query.addChildEventListener(object: ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                val data = mutableListOf<Consumption>()
+                snapshot.getValue(Consumption::class.java)?.let {
+                    data.add(it)
+                    onSuccess(data)
+                }
+            }
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onChildRemoved(snapshot: DataSnapshot) {}
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onCancelled(error: DatabaseError) { onFail() }
+        })
+    }
+
     fun uploadBillImage(
         uri: Uri,
         onComplete: (String?) -> Unit,
     ) {
         val ref = storage.child(billsRef).child(System.currentTimeMillis().toString())
+        val uploadTask = ref.putFile(uri)
+        uploadTask.continueWithTask { task ->
+            if (!task.isSuccessful) {
+                task.exception?.let {
+                    throw it
+                }
+            }
+            ref.downloadUrl
+        }.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                onComplete(task.result.toString())
+            } else onComplete(null)
+        }
+    }
+
+    fun uploadConsumptionImage(
+        uri: Uri,
+        onComplete: (String?) -> Unit,
+    ) {
+        val ref = storage.child(consumptionsRef).child(System.currentTimeMillis().toString())
         val uploadTask = ref.putFile(uri)
         uploadTask.continueWithTask { task ->
             if (!task.isSuccessful) {
