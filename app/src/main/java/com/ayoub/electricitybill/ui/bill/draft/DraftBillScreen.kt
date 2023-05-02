@@ -100,7 +100,7 @@ private fun NewConsumptionView(
     Card(
         modifier = Modifier.padding(16.dp),
         elevation = 10.dp,
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(12.dp)
     ) {
         Column(
             modifier = Modifier
@@ -198,7 +198,7 @@ private fun ConsumptionDetailsView(
     Card(
         modifier = Modifier.padding(16.dp),
         elevation = 10.dp,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(12.dp),
     ) {
         Column(
             modifier = Modifier
@@ -235,8 +235,9 @@ private fun ConsumptionDetailsView(
             consumption.cost?.let {
                 Box(
                     modifier = Modifier
-                        .padding(16.dp)
-                        .border(width = 1.dp, shape = RoundedCornerShape(10.dp), color = Color.Gray)
+                        .border(width = 1.dp, shape = RoundedCornerShape(8.dp), color = Color.Gray)
+                        .background(color = Color.Gray.copy(alpha = 0.1f), RoundedCornerShape(8.dp))
+                        .padding(10.dp)
                 ) {
                     ConsumptionDetailsViewItem(
                         title = "Prix:",
@@ -252,16 +253,28 @@ private fun ConsumptionDetailsView(
                 consumption.cost?.let {
                     Box(
                         modifier = Modifier
-                            .padding(16.dp)
                             .background(
-                                shape = RoundedCornerShape(10.dp),
-                                color = if (consumption.payed) Color.Green else Color.Red
+                                shape = RoundedCornerShape(8.dp),
+                                color = if (consumption.payed) Purple700 else Color.Red
                             )
+                            .padding(10.dp)
                     ) {
-                        ConsumptionDetailsViewItem(
-                            title = "Totale:",
-                            value = (it + gaz).toNiceFormat()
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                modifier = Modifier.weight(1f),
+                                text = "Totale:",
+                                color = Color.White,
+                                fontSize = 16.sp,
+                            )
+                            Text(
+                                text = "${(it + gaz).toNiceFormat()}DA",
+                                color = Color.White,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.W800
+                            )
+                        }
                     }
                 }
             }
@@ -273,6 +286,7 @@ private fun ConsumptionDetailsView(
 private fun ConsumptionDetailsViewItem(
     title: String,
     value: String,
+    color: Color = Color.Black,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically
@@ -280,12 +294,12 @@ private fun ConsumptionDetailsViewItem(
         Text(
             modifier = Modifier.weight(1f),
             text = title,
-            color = Color.Black,
+            color = color,
             fontSize = 16.sp,
         )
         Text(
             text = value,
-            color = Color.Black,
+            color = color,
             fontSize = 16.sp,
             fontWeight = FontWeight.W600
         )
