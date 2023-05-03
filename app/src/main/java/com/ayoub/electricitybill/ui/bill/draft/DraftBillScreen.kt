@@ -383,9 +383,10 @@ private fun BillInfoView(
                 contentDescription = null,
                 contentScale = ContentScale.FillWidth,
             )
-            Divider()
             consumptions?.forEach { item ->
+                Divider()
                 ConsumptionItem(consumption = item, viewModel = viewModel)
+                Divider()
             }
         }
     }
