@@ -6,6 +6,7 @@ import com.ayoub.electricitybill.firebase.FirebaseDatabase
 import com.ayoub.electricitybill.firebase.FirebaseUserAuth
 import com.ayoub.electricitybill.firebase.billsRef
 import com.ayoub.electricitybill.model.Bill
+import com.ayoub.electricitybill.model.Consumer
 import com.ayoub.electricitybill.model.Consumption
 import com.ayoub.electricitybill.ui.uiState.UiState
 import com.google.firebase.auth.FirebaseAuth
@@ -95,6 +96,17 @@ class DraftBillViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun getConsumerById(id: String, onComplete: (Consumer?) -> Unit) {
+        firebaseDatabase.getConsumerById(id, onComplete = onComplete)
+    }
+
+    fun togglePayed(id: String, value: Boolean, onSuccess: () -> Unit) {
+        firebaseDatabase.toggleConsumptionPayed(
+            id, value,
+            onSuccess = onSuccess,
+        )
     }
 
     fun uploadConsumptionImage(uri: Uri) {

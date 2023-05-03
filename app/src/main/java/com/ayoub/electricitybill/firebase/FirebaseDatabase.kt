@@ -3,6 +3,7 @@ package com.ayoub.electricitybill.firebase
 import android.app.Application
 import android.net.Uri
 import com.ayoub.electricitybill.model.Bill
+import com.ayoub.electricitybill.model.Consumer
 import com.ayoub.electricitybill.model.Consumption
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.database.*
@@ -15,6 +16,7 @@ import javax.inject.Singleton
 const val billsRef = "bills"
 const val draftBillRef = "draftBill"
 const val consumptionsRef = "consumptions"
+const val consumersRef = "consumers"
 
 @Singleton
 class FirebaseDatabase @Inject constructor(
@@ -90,6 +92,42 @@ class FirebaseDatabase @Inject constructor(
                 if (!snapshot.exists()) onFail()
             }
             override fun onCancelled(error: DatabaseError) { onFail() }
+        })
+    }
+
+    fun getConsumerById(
+        id: String,
+        onComplete: (Consumer?) -> Unit,
+    ) {
+        val query: Query = database.child(consumersRef).orderByChild("id").equalTo(id)
+        query.addListenerForSingleValueEvent(object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                snapshot.children.forEach {
+                    it.getValue(Consumer::class.java)?.let(block = onComplete) ?: onComplete(null)
+                }
+            }
+            override fun onCancelled(error: DatabaseError) { onComplete(null) }
+        })
+    }
+
+    fun toggleConsumptionPayed(
+        id: String,
+        value: Boolean,
+        onSuccess: () -> Unit,
+        onFail: (() -> Unit)? = null,
+    ) {
+        val query: Query = database.child(consumptionsRef).orderByChild("id").equalTo(id)
+        query.addListenerForSingleValueEvent(object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    snapshot.children.forEach {
+                        it.ref.child("payed").setValue(value)
+                            .addOnSuccessListener { onSuccess() }
+                            .addOnFailureListener { onFail?.invoke() }
+                    }
+                } else onFail?.invoke()
+            }
+            override fun onCancelled(error: DatabaseError) { onFail?.invoke() }
         })
     }
 

@@ -1,7 +1,6 @@
 package com.ayoub.electricitybill.ui.bill.draft
 
 import android.net.Uri
-import android.widget.ScrollView
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -10,12 +9,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
@@ -32,10 +32,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ayoub.electricitybill.R
 import com.ayoub.electricitybill.extension.createImageUri
 import com.ayoub.electricitybill.extension.toNiceFormat
 import com.ayoub.electricitybill.model.Bill
+import com.ayoub.electricitybill.model.Consumer
 import com.ayoub.electricitybill.model.Consumption
 import com.ayoub.electricitybill.ui.theme.Purple500
 import com.ayoub.electricitybill.ui.theme.Purple700
@@ -103,8 +105,8 @@ private fun Success(
                         } ?: run {
                             NewConsumptionView(viewModel = viewModel)
                         }
-                        Spacer(modifier = Modifier.height(16.dp))
-                        BillInfoView(bill = bill, consumptions = data.data as? List<Consumption>)
+                        Spacer(modifier = Modifier.height(20.dp))
+                        BillInfoView(bill = bill, consumptions = data.data as? List<Consumption>, viewModel = viewModel)
                     }
                 }
             }
@@ -134,7 +136,7 @@ private fun NewConsumptionView(
     }
 
     Card(
-        elevation = 10.dp,
+        elevation = 7.dp,
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(
@@ -258,7 +260,7 @@ private fun ConsumptionDetailsView(
     extra: Double?,
 ) {
     Card(
-        elevation = 10.dp,
+        elevation = 7.dp,
         shape = RoundedCornerShape(12.dp),
     ) {
         Column(
@@ -276,19 +278,19 @@ private fun ConsumptionDetailsView(
                 fontWeight = FontWeight.W600,
             )
             consumption.prevCounter?.let {
-                ConsumptionDetailsViewItem(
+                TileListItem(
                     title = "Ancien compteur",
                     value = it.toInt().toString()
                 )
             }
             consumption.currCounter.let {
-                ConsumptionDetailsViewItem(
+                TileListItem(
                     title = "Nouveau compteur",
                     value = it.toInt().toString()
                 )
             }
             consumption.value?.let {
-                ConsumptionDetailsViewItem(
+                TileListItem(
                     title = "Consommation",
                     value = it.toInt().toString()
                 )
@@ -300,14 +302,14 @@ private fun ConsumptionDetailsView(
                         .background(color = Color.Gray.copy(alpha = 0.1f), RoundedCornerShape(8.dp))
                         .padding(10.dp)
                 ) {
-                    ConsumptionDetailsViewItem(
+                    TileListItem(
                         title = "Prix:",
                         value = "${it.toNiceFormat()}DA"
                     )
                 }
             }
             extra?.let { gaz ->
-                ConsumptionDetailsViewItem(
+                TileListItem(
                     title = "Prix de gaz:",
                     value = "${gaz.toNiceFormat()}DA"
                 )
@@ -347,9 +349,10 @@ private fun ConsumptionDetailsView(
 private fun BillInfoView(
     bill: Bill,
     consumptions: List<Consumption>?,
+    viewModel: DraftBillViewModel,
 ) {
     Card(
-        elevation = 10.dp,
+        elevation = 7.dp,
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(
@@ -366,9 +369,13 @@ private fun BillInfoView(
                 fontSize = 20.sp,
                 fontWeight = FontWeight.W600,
             )
-            ConsumptionDetailsViewItem(
+            TileListItem(
                 title = "Facture",
                 value = bill.name
+            )
+            TileListItem(
+                title = "Prix de gaz (1):",
+                value = "${bill.extra.toNiceFormat()}DA"
             )
             GlideImage(
                 modifier = Modifier.clip(RoundedCornerShape(8.dp)),
@@ -376,12 +383,90 @@ private fun BillInfoView(
                 contentDescription = null,
                 contentScale = ContentScale.FillWidth,
             )
+            Divider()
+            consumptions?.forEach { item ->
+                ConsumptionItem(consumption = item, viewModel = viewModel)
+            }
         }
     }
 }
 
 @Composable
-private fun ConsumptionDetailsViewItem(
+private fun ConsumptionItem(
+    consumption: Consumption,
+    viewModel: DraftBillViewModel,
+) {
+    val isPayed = remember { mutableStateOf(consumption.payed) }
+    val consumer = remember { mutableStateOf<Consumer?>(null) }
+    viewModel.getConsumerById(id = consumption.consumer) {
+        consumer.value = it
+    }
+
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalAlignment = Alignment.Top,
+    ) {
+        Icon(
+            modifier = Modifier.size(35.dp),
+            imageVector = Icons.Default.AccountCircle,
+            contentDescription = null,
+            tint = Color.LightGray,
+        )
+        Column(
+            modifier = Modifier.weight(1f).padding(top = 5.dp),
+            verticalArrangement = Arrangement.spacedBy(0.dp)
+        ) {
+            consumer.value?.let {
+                Text(
+                    it.name,
+                    fontWeight = FontWeight.W600,
+                    fontSize = 16.sp,
+                    color = Color.Black,
+                )
+            } ?: run {
+                Box(
+                    modifier = Modifier
+                        .size(width = 100.dp, height = 20.dp)
+                        .clip(CircleShape)
+                        .background(Color.LightGray)
+                )
+            }
+            consumption.value?.let {
+                TileListItem(
+                    title = "Consommation",
+                    value = it.toInt().toString()
+                )
+            }
+            consumption.cost?.let {
+                TileListItem(
+                    title = "Prix:",
+                    value = "${it.toNiceFormat()}DA"
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = "Payé",
+                    color = Color.Black,
+                    fontSize = 16.sp,
+                )
+                Switch(checked = isPayed.value, onCheckedChange = {
+                    viewModel.togglePayed(
+                        id = consumption.id,
+                        value = it,
+                    ) {
+                        isPayed.value = it
+                    }
+                })
+            }
+        }
+    }
+}
+
+@Composable
+private fun TileListItem(
     title: String,
     value: String,
     color: Color = Color.Black,
