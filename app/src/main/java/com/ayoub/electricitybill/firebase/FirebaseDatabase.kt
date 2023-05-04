@@ -43,6 +43,15 @@ class FirebaseDatabase @Inject constructor(
             }
     }
 
+    fun clearDraftBill(
+        onSuccess: () -> Unit,
+        onFail: () -> Unit,
+    ) {
+        database.child(draftBillRef).setValue(null)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { onFail() }
+    }
+
     fun createNewConsumption(consumption: Consumption, onSuccess: () -> Unit, onFail: () -> Unit) {
         database.child(consumptionsRef).push().setValue(consumption)
             .addOnSuccessListener { onSuccess() }
@@ -122,6 +131,27 @@ class FirebaseDatabase @Inject constructor(
                 if (snapshot.exists()) {
                     snapshot.children.forEach {
                         it.ref.child("payed").setValue(value)
+                            .addOnSuccessListener { onSuccess() }
+                            .addOnFailureListener { onFail?.invoke() }
+                    }
+                } else onFail?.invoke()
+            }
+            override fun onCancelled(error: DatabaseError) { onFail?.invoke() }
+        })
+    }
+
+    fun updateConsumptionCost(
+        id: String,
+        value: Double,
+        onSuccess: () -> Unit,
+        onFail: (() -> Unit)? = null,
+    ) {
+        val query: Query = database.child(consumptionsRef).orderByChild("id").equalTo(id)
+        query.addListenerForSingleValueEvent(object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    snapshot.children.forEach {
+                        it.ref.child("cost").setValue(value)
                             .addOnSuccessListener { onSuccess() }
                             .addOnFailureListener { onFail?.invoke() }
                     }

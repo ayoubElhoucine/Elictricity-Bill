@@ -31,12 +31,13 @@ class NewBillViewModel @Inject constructor(
         _uiState.value = UiState.Idle
     }
 
-    fun createDraftBill(name: String, extra: Double) {
+    fun createDraftBill(amount: Double, extra: Double) {
         billImage?.let { image ->
             _uiState.value = UiState.Loading
             val bill = Bill(
                 id = UUID.randomUUID().toString(),
-                name = name,
+                amount = amount,
+                name = "${amount}DA",
                 extra = extra,
                 image = image,
                 createdAt = System.currentTimeMillis()

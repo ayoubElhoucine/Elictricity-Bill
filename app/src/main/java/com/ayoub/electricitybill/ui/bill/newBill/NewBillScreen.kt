@@ -32,7 +32,7 @@ fun NewBillScreen(
     val context = LocalContext.current
     val uiState = viewModel.uiState.collectAsState()
     val uploadImageUiState = viewModel.uploadImageUiState.collectAsState()
-    val name = remember { mutableStateOf("") }
+    val amount = remember { mutableStateOf("") }
     val extra = remember { mutableStateOf("") }
 
     val cameraImageUri = remember { mutableStateOf<Uri?>(null) }
@@ -87,15 +87,15 @@ fun NewBillScreen(
             }
         }
         OutlinedTextField(
-            value = name.value,
+            value = amount.value,
             placeholder = {
-                Text(text = "Nom")
+                Text(text = "Montante de facutre")
             },
             onValueChange = {
-                name.value = it
+                amount.value = it
             },
             keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Email
+                keyboardType = KeyboardType.Decimal
             )
         )
         OutlinedTextField(
@@ -116,9 +116,9 @@ fun NewBillScreen(
                 backgroundColor = Purple500
             ),
             onClick = {
-                viewModel.createDraftBill(name = name.value, extra = extra.value.toDouble())
+                viewModel.createDraftBill(amount = amount.value.toDouble(), extra = extra.value.toDouble())
             },
-            enabled = name.value.isNotBlank() && extra.value.isNotBlank(),
+            enabled = amount.value.isNotBlank() && extra.value.isNotBlank(),
             shape = CircleShape
         ) {
             when(uiState.value) {

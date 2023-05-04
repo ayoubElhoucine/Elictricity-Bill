@@ -78,7 +78,7 @@ fun DraftBillScreen(
                 UiState.Loading -> CircularProgressIndicator()
                 is UiState.Success -> {
                     (data.data as? Bill)?.let { bill ->
-                        Success(viewModel = viewModel, bill = bill)
+                        Success(viewModel = viewModel, bill = bill, onBack = onBack)
                     }
                 }
                 else -> LaunchedEffect(Unit) { onBack() }
@@ -91,6 +91,7 @@ fun DraftBillScreen(
 private fun Success(
     viewModel: DraftBillViewModel,
     bill: Bill,
+    onBack: () -> Unit,
 ) {
     val conUiState = viewModel.conUiState.collectAsState()
     val myConsumption = viewModel.myConsumption.collectAsState()
@@ -113,6 +114,9 @@ private fun Success(
                         }
                         Spacer(modifier = Modifier.height(20.dp))
                         BillInfoView(bill = bill, consumptions = data.data as? List<Consumption>, viewModel = viewModel)
+                        (data.data as? List<Consumption>)?.let {
+                            Footer(viewModel = viewModel, consumptions = it, onBack = onBack)
+                        }
                     }
                 }
             }
@@ -142,7 +146,7 @@ private fun NewConsumptionView(
     }
 
     Card(
-        elevation = 7.dp,
+        elevation = 3.dp,
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(
@@ -266,7 +270,7 @@ private fun ConsumptionDetailsView(
     extra: Double?,
 ) {
     Card(
-        elevation = 7.dp,
+        elevation = 3.dp,
         shape = RoundedCornerShape(12.dp),
     ) {
         Column(
@@ -322,9 +326,16 @@ private fun ConsumptionDetailsView(
                 consumption.cost?.let {
                     Box(
                         modifier = Modifier
-                            .background(
+                            .border(
+                                width = 2.dp,
                                 shape = RoundedCornerShape(8.dp),
                                 color = if (consumption.payed) Purple700 else Color.Red
+                            )
+                            .background(
+                                shape = RoundedCornerShape(8.dp),
+                                color = if (consumption.payed) Purple700.copy(0.7f) else Color.Red.copy(
+                                    0.7f
+                                )
                             )
                             .padding(10.dp)
                     ) {
@@ -358,7 +369,7 @@ private fun BillInfoView(
     viewModel: DraftBillViewModel,
 ) {
     Card(
-        elevation = 7.dp,
+        elevation = 3.dp,
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(
@@ -409,7 +420,8 @@ private fun ConsumptionItem(
 
     Column(
         modifier = Modifier
-            .background(Color.Black.copy(0.05f), shape = RoundedCornerShape(10.dp))
+            .background(Color.Black.copy(0.01f), shape = RoundedCornerShape(10.dp))
+            .border(width = 1.dp, color = Color.Black.copy(0.2f), shape = RoundedCornerShape(10.dp))
             .padding(10.dp),
         verticalArrangement = Arrangement.spacedBy(0.dp),
     ) {
@@ -495,9 +507,57 @@ private fun ConsumptionItem(
 @Composable
 private fun Footer(
     viewModel: DraftBillViewModel,
-
+    consumptions: List<Consumption>,
+    onBack: () -> Unit,
 ) {
-
+    val calculateUiState = viewModel.calculateUiState.collectAsState()
+    val terminateUiState = viewModel.createUiState.collectAsState()
+    Column(
+        modifier = Modifier.padding(top = 40.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        consumptions.find { e -> e.value == null } ?: run {
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Purple500
+                ),
+                onClick = viewModel::calculateCost
+            ) {
+                when(calculateUiState.value) {
+                    UiState.Loading -> CircularProgressIndicator(modifier = Modifier.size(30.dp), color = Color.White)
+                    is UiState.Fail -> Text("réessayer", color = Color.White)
+                    else -> Text("Calculer le prix", color = Color.White)
+                }
+            }
+        }
+        consumptions.find { e -> e.cost == null } ?: run {
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color.Black
+                ),
+                onClick = viewModel::terminate
+            ) {
+                when(terminateUiState.value) {
+                    UiState.Loading -> CircularProgressIndicator(modifier = Modifier.size(30.dp), color = Color.White)
+                    is UiState.Fail -> Text("réessayer", color = Color.White)
+                    is UiState.Success -> {
+                        LaunchedEffect(Unit) {
+                            onBack()
+                        }
+                    }
+                    else -> Text("Terminé", color = Color.White)
+                }
+            }
+        }
+    }
 }
 
 @Composable
