@@ -23,9 +23,7 @@ fun HomeScreen(
     onDraftedBill: () -> Unit,
 ) {
     LaunchedEffect(Unit) {
-        viewModel.getDraftBill {
-            onDraftedBill()
-        }
+        viewModel.getDraftBill(onDraftedBill)
     }
     val uiState = viewModel.uiState.collectAsState()
     Scaffold(

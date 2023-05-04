@@ -34,6 +34,7 @@ class DraftBillViewModel @Inject constructor(
     private val _myConsumption: MutableStateFlow<Consumption?> = MutableStateFlow(null)
     val myConsumption: StateFlow<Consumption?> get() = _myConsumption
 
+    private var prevConsumption: Consumption? = null
     private var consumptionImage: String? = null
 
     init {
@@ -64,20 +65,34 @@ class DraftBillViewModel @Inject constructor(
         )
     }
 
+    fun getPreviousBillConsumption(id: String) {
+        firebaseDatabase.getBillConsumptions(
+            id = id,
+            onSuccess = {
+                firebaseAuth.getUser()?.let { user ->
+                    prevConsumption = it.find { e -> e.consumer == user.uid }
+                }
+            },
+            onFail = {}
+        )
+    }
+
     fun createNewConsumption(counter: Double, missingImage: () -> Unit){
         (_uiState.value as? UiState.Success)?.let { data ->
-            (data.data as? Bill)?.let {bill ->
+            (data.data as? Bill)?.let { bill ->
                 _createUiState.value = UiState.Loading
                 consumptionImage?.let { image ->
                     firebaseAuth.getUser()?.let { user ->
                         firebaseDatabase.createNewConsumption(
                             consumption = Consumption(
                                 id = UUID.randomUUID().toString(),
+                                prevCounter = prevConsumption?.prevCounter,
                                 currCounter = counter,
+                                value = prevConsumption?.let { counter - it.currCounter },
                                 image = image,
                                 consumer = user.uid,
                                 bill = bill.id,
-                                createdAt = System.currentTimeMillis()
+                                createdAt = System.currentTimeMillis(),
                             ),
                             onSuccess = {
                                 _createUiState.value = UiState.Success()
