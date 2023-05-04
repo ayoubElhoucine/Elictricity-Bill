@@ -94,14 +94,16 @@ private fun Success(
 ) {
     val conUiState = viewModel.conUiState.collectAsState()
     val myConsumption = viewModel.myConsumption.collectAsState()
-    Column {
+    Column(
+        modifier = Modifier.background(Color.LightGray.copy(0.3f))
+    ) {
         when (val data = conUiState.value) {
             UiState.Loading -> Box(modifier = Modifier.fillMaxSize()) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
             is UiState.Success -> {
                 LazyColumn(
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 20.dp),
+                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 20.dp),
                 ) {
                     item {
                         myConsumption.value?.let {
@@ -388,9 +390,7 @@ private fun BillInfoView(
                 contentScale = ContentScale.FillWidth,
             )
             consumptions?.forEach { item ->
-                Divider()
                 ConsumptionItem(consumption = item, viewModel = viewModel)
-                Divider()
             }
         }
     }
@@ -408,7 +408,10 @@ private fun ConsumptionItem(
     }
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(0.dp)
+        modifier = Modifier
+            .background(Color.Black.copy(0.05f), shape = RoundedCornerShape(10.dp))
+            .padding(10.dp),
+        verticalArrangement = Arrangement.spacedBy(0.dp),
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -487,6 +490,14 @@ private fun ConsumptionItem(
             })
         }
     }
+}
+
+@Composable
+private fun Footer(
+    viewModel: DraftBillViewModel,
+
+) {
+
 }
 
 @Composable

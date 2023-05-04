@@ -136,10 +136,10 @@ class FirebaseDatabase @Inject constructor(
         onSuccess: (List<Consumption>) -> Unit,
         onFail: () -> Unit,
     ){
+        val data = mutableListOf<Consumption>()
         val query: Query = database.child(consumptionsRef).orderByChild("bill").equalTo(id)
         query.addChildEventListener(object: ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                val data = mutableListOf<Consumption>()
                 snapshot.getValue(Consumption::class.java)?.let {
                     data.add(it)
                     onSuccess(data)
