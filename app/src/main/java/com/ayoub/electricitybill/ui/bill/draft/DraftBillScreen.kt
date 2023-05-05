@@ -45,14 +45,9 @@ import com.skydoves.landscapist.glide.GlideImage
 @Composable
 fun DraftBillScreen(
     viewModel: DraftBillViewModel = hiltViewModel(),
-    previousBillId: String? = "615d4869-77ac-446b-9a21-1c64fe7bb00c",
     onBack: () -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsState()
-    LaunchedEffect(Unit) {
-        previousBillId?.let { viewModel.getPreviousBillConsumption(it) }
-    }
-
     Scaffold(
         topBar = {
             TopAppBar {
@@ -417,44 +412,46 @@ private fun Footer(
         modifier = Modifier.padding(top = 40.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        consumptions.find { e -> e.value == null } ?: run {
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Purple500
-                ),
-                onClick = viewModel::calculateCost
-            ) {
-                when(calculateUiState.value) {
-                    UiState.Loading -> CircularProgressIndicator(modifier = Modifier.size(30.dp), color = Color.White)
-                    is UiState.Fail -> Text("réessayer", color = Color.White)
-                    else -> Text("Calculer le prix", color = Color.White)
+        if (consumptions.isNotEmpty()) {
+            consumptions.find { e -> e.value == null } ?: run {
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Purple500
+                    ),
+                    onClick = viewModel::calculateCost
+                ) {
+                    when(calculateUiState.value) {
+                        UiState.Loading -> CircularProgressIndicator(modifier = Modifier.size(30.dp), color = Color.White)
+                        is UiState.Fail -> Text("réessayer", color = Color.White)
+                        else -> Text("Calculer le prix", color = Color.White)
+                    }
                 }
             }
-        }
-        consumptions.find { e -> e.cost == null } ?: run {
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color.Black
-                ),
-                onClick = viewModel::terminate
-            ) {
-                when(terminateUiState.value) {
-                    UiState.Loading -> CircularProgressIndicator(modifier = Modifier.size(30.dp), color = Color.White)
-                    is UiState.Fail -> Text("réessayer", color = Color.White)
-                    is UiState.Success -> {
-                        LaunchedEffect(Unit) {
-                            onBack()
+            consumptions.find { e -> e.cost == null } ?: run {
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.Black
+                    ),
+                    onClick = viewModel::terminate
+                ) {
+                    when(terminateUiState.value) {
+                        UiState.Loading -> CircularProgressIndicator(modifier = Modifier.size(30.dp), color = Color.White)
+                        is UiState.Fail -> Text("réessayer", color = Color.White)
+                        is UiState.Success -> {
+                            LaunchedEffect(Unit) {
+                                onBack()
+                            }
                         }
+                        else -> Text("Terminé", color = Color.White)
                     }
-                    else -> Text("Terminé", color = Color.White)
                 }
             }
         }

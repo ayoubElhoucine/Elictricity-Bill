@@ -49,6 +49,7 @@ class DraftBillViewModel @Inject constructor(
 
     init {
         getData()
+        getPreviousBillConsumption()
     }
 
     private fun getData() {
@@ -75,15 +76,19 @@ class DraftBillViewModel @Inject constructor(
         )
     }
 
-    fun getPreviousBillConsumption(id: String) {
-        firebaseDatabase.getBillConsumptions(
-            id = id,
-            onSuccess = {
-                firebaseAuth.getUser()?.let { user ->
-                    prevConsumption = it.find { e -> e.consumer == user.uid }
-                }
-            },
-            onFail = {}
+    private fun getPreviousBillConsumption() {
+        firebaseDatabase.getLatestBill(
+            onSuccess = { bill ->
+                firebaseDatabase.getBillConsumptions(
+                    id = bill.id,
+                    onSuccess = {
+                        firebaseAuth.getUser()?.let { user ->
+                            prevConsumption = it.find { e -> e.consumer == user.uid }
+                        }
+                    },
+                    onFail = {}
+                )
+            }
         )
     }
 
@@ -96,7 +101,7 @@ class DraftBillViewModel @Inject constructor(
                         firebaseDatabase.createNewConsumption(
                             consumption = Consumption(
                                 id = UUID.randomUUID().toString(),
-                                prevCounter = prevConsumption?.prevCounter,
+                                prevCounter = prevConsumption?.currCounter,
                                 currCounter = counter,
                                 value = prevConsumption?.let { counter - it.currCounter },
                                 image = image,

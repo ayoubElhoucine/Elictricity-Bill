@@ -13,6 +13,7 @@ import com.google.firebase.storage.ktx.storage
 import javax.inject.Inject
 import javax.inject.Singleton
 
+
 const val billsRef = "bills"
 const val draftBillRef = "draftBill"
 const val consumptionsRef = "consumptions"
@@ -74,6 +75,21 @@ class FirebaseDatabase @Inject constructor(
             override fun onCancelled(error: DatabaseError) {
                 onFail?.invoke()
             }
+        })
+    }
+
+    fun getLatestBill(
+        onSuccess: (Bill) -> Unit,
+        onFail: (() -> Unit) ? = null,
+    ) {
+        val lastQuery: Query = database.child(billsRef).orderByKey().limitToLast(1)
+        lastQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                snapshot.children.forEach {
+                    it.getValue(Bill::class.java)?.let(block = onSuccess) ?: onFail?.invoke()
+                }
+            }
+            override fun onCancelled(databaseError: DatabaseError) { onFail?.invoke() }
         })
     }
 
