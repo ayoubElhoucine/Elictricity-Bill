@@ -180,11 +180,7 @@ fun NewBillScreen(
                     when(uiState.value) {
                         UiState.Idle -> Text(text = "Confirmer", color = Color.White)
                         UiState.Loading -> CircularProgressIndicator(modifier = Modifier.size(30.dp), color = Color.White)
-                        is UiState.Success -> {
-                            LaunchedEffect(Unit) {
-                                onBack()
-                            }
-                        }
+                        is UiState.Success -> onBack()
                         else -> Text(text = "Réessayez", color = Color.White)
                     }
                 }

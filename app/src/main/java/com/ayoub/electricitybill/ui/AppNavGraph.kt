@@ -63,7 +63,7 @@ fun AppNavGraph(
         composable(Screens.NEW_BILL) {
             BackHandler(onBack = appState::popBack)
             NewBillScreen(
-                onBack = appState::popBack,
+                onBack = { appState.popBack(to = Screens.HOME) },
             )
         }
         composable(Screens.DRAFT_BILL) {
