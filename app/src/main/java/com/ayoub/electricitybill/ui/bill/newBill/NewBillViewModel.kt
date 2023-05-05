@@ -59,7 +59,7 @@ class NewBillViewModel @Inject constructor(
         firebaseDatabase.uploadBillImage(uri) { image ->
             billImage = image
             image?.let {
-                _uploadImageUiState.value = UiState.Success()
+                _uploadImageUiState.value = UiState.Success(it)
             } ?: run {
                 _uploadImageUiState.value = UiState.Fail()
             }

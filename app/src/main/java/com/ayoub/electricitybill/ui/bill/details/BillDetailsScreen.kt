@@ -1,6 +1,5 @@
 package com.ayoub.electricitybill.ui.bill.details
 
-import android.content.ClipData.Item
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -26,7 +25,6 @@ import com.ayoub.electricitybill.extension.toNiceFormat
 import com.ayoub.electricitybill.model.Bill
 import com.ayoub.electricitybill.model.Consumer
 import com.ayoub.electricitybill.model.Consumption
-import com.ayoub.electricitybill.ui.bill.draft.DraftBillViewModel
 import com.ayoub.electricitybill.ui.components.TileListItem
 import com.ayoub.electricitybill.ui.uiState.UiState
 import com.skydoves.landscapist.glide.GlideImage
