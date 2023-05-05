@@ -28,11 +28,11 @@ fun LoginScreen(
     val password = remember { mutableStateOf("") }
 
     Column(
-        modifier = Modifier.padding(16.dp).fillMaxSize(),
+        modifier = Modifier.padding(20.dp).fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(25.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Spacer(modifier = Modifier.height(50.dp))
+        Spacer(modifier = Modifier.height(30.dp))
         Text(
             text = "Connexion",
             fontSize = 26.sp,
