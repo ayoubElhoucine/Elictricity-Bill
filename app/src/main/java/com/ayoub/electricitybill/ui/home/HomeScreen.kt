@@ -102,6 +102,7 @@ private fun Success(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun BillItem(
     bill: Bill,
@@ -110,10 +111,10 @@ private fun BillItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
             .clickable(onClick = onClick),
         elevation = 2.dp,
         shape = RoundedCornerShape(12.dp),
+        onClick = onClick,
     ) {
         Row(
             modifier = Modifier.padding(16.dp),

@@ -2,6 +2,7 @@ package com.ayoub.electricitybill.ui.login
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -39,6 +40,7 @@ fun LoginScreen(
             color = Color.Black,
         )
         OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
             value = name.value,
             placeholder = {
                 Text(text = "Nom d'utilisateur")
@@ -51,6 +53,7 @@ fun LoginScreen(
             )
         )
         OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
             value = password.value,
             placeholder = {
                 Text(text = "Mote de pass")
@@ -68,17 +71,22 @@ fun LoginScreen(
                 viewModel.login(name.value, password.value)
             },
             enabled = name.value.isNotBlank() && password.value.isNotBlank(),
-            shape = CircleShape
+            shape = RoundedCornerShape(8.dp),
         ) {
-            when(uiState.value) {
-                UiState.Idle -> Text(text = "Continue", color = Color.White)
-                UiState.Loading -> CircularProgressIndicator(modifier = Modifier.size(30.dp), color = Color.White)
-                is UiState.Success -> {
-                    LaunchedEffect(Unit) {
-                        onHome()
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.Center,
+            ) {
+                when(uiState.value) {
+                    UiState.Idle -> Text(text = "Continue", color = Color.White)
+                    UiState.Loading -> CircularProgressIndicator(modifier = Modifier.size(30.dp), color = Color.White)
+                    is UiState.Success -> {
+                        LaunchedEffect(Unit) {
+                            onHome()
+                        }
                     }
+                    else -> Text(text = "Réessayez", color = Color.White)
                 }
-                else -> Text(text = "Réessayez", color = Color.White)
             }
         }
         Spacer(modifier = Modifier.weight(1f))
