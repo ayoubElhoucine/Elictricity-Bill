@@ -9,13 +9,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
@@ -32,13 +30,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ayoub.electricitybill.R
 import com.ayoub.electricitybill.extension.createImageUri
 import com.ayoub.electricitybill.extension.toNiceFormat
 import com.ayoub.electricitybill.model.Bill
 import com.ayoub.electricitybill.model.Consumer
 import com.ayoub.electricitybill.model.Consumption
+import com.ayoub.electricitybill.ui.components.TileListItem
 import com.ayoub.electricitybill.ui.theme.Purple500
 import com.ayoub.electricitybill.ui.theme.Purple700
 import com.ayoub.electricitybill.ui.uiState.UiState
@@ -408,6 +406,62 @@ private fun BillInfoView(
 }
 
 @Composable
+private fun Footer(
+    viewModel: DraftBillViewModel,
+    consumptions: List<Consumption>,
+    onBack: () -> Unit,
+) {
+    val calculateUiState = viewModel.calculateUiState.collectAsState()
+    val terminateUiState = viewModel.createUiState.collectAsState()
+    Column(
+        modifier = Modifier.padding(top = 40.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        consumptions.find { e -> e.value == null } ?: run {
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Purple500
+                ),
+                onClick = viewModel::calculateCost
+            ) {
+                when(calculateUiState.value) {
+                    UiState.Loading -> CircularProgressIndicator(modifier = Modifier.size(30.dp), color = Color.White)
+                    is UiState.Fail -> Text("réessayer", color = Color.White)
+                    else -> Text("Calculer le prix", color = Color.White)
+                }
+            }
+        }
+        consumptions.find { e -> e.cost == null } ?: run {
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color.Black
+                ),
+                onClick = viewModel::terminate
+            ) {
+                when(terminateUiState.value) {
+                    UiState.Loading -> CircularProgressIndicator(modifier = Modifier.size(30.dp), color = Color.White)
+                    is UiState.Fail -> Text("réessayer", color = Color.White)
+                    is UiState.Success -> {
+                        LaunchedEffect(Unit) {
+                            onBack()
+                        }
+                    }
+                    else -> Text("Terminé", color = Color.White)
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun ConsumptionItem(
     consumption: Consumption,
     viewModel: DraftBillViewModel,
@@ -501,85 +555,5 @@ private fun ConsumptionItem(
                 }
             })
         }
-    }
-}
-
-@Composable
-private fun Footer(
-    viewModel: DraftBillViewModel,
-    consumptions: List<Consumption>,
-    onBack: () -> Unit,
-) {
-    val calculateUiState = viewModel.calculateUiState.collectAsState()
-    val terminateUiState = viewModel.createUiState.collectAsState()
-    Column(
-        modifier = Modifier.padding(top = 40.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-        consumptions.find { e -> e.value == null } ?: run {
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Purple500
-                ),
-                onClick = viewModel::calculateCost
-            ) {
-                when(calculateUiState.value) {
-                    UiState.Loading -> CircularProgressIndicator(modifier = Modifier.size(30.dp), color = Color.White)
-                    is UiState.Fail -> Text("réessayer", color = Color.White)
-                    else -> Text("Calculer le prix", color = Color.White)
-                }
-            }
-        }
-        consumptions.find { e -> e.cost == null } ?: run {
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color.Black
-                ),
-                onClick = viewModel::terminate
-            ) {
-                when(terminateUiState.value) {
-                    UiState.Loading -> CircularProgressIndicator(modifier = Modifier.size(30.dp), color = Color.White)
-                    is UiState.Fail -> Text("réessayer", color = Color.White)
-                    is UiState.Success -> {
-                        LaunchedEffect(Unit) {
-                            onBack()
-                        }
-                    }
-                    else -> Text("Terminé", color = Color.White)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun TileListItem(
-    title: String,
-    value: String,
-    color: Color = Color.Black,
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            modifier = Modifier.weight(1f),
-            text = title,
-            color = color,
-            fontSize = 16.sp,
-        )
-        Text(
-            text = value,
-            color = color,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.W600
-        )
     }
 }
