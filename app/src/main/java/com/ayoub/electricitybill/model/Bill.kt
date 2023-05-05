@@ -11,4 +11,9 @@ data class Bill(
     val image: String = "",
     val extra: Double = 0.0,
     val createdAt: Long = 0,
-): Parcelable
+): Parcelable, Comparable<Bill> {
+    override fun compareTo(other: Bill): Int {
+        return if (this.createdAt < other.createdAt) 1
+        else -1
+    }
+}

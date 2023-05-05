@@ -1,6 +1,9 @@
 package com.ayoub.electricitybill.ui.splash
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -20,10 +23,10 @@ fun SplashScreen(
             onHome = onHome,
         )
     }
-    Box {
-        Text(
-            text = "splash screen",
-            modifier = Modifier.align(Alignment.Center)
-        )
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(text = "Chargement en cours")
     }
 }

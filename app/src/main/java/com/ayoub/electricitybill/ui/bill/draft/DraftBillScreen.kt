@@ -60,7 +60,8 @@ fun DraftBillScreen(
                     fontWeight = FontWeight.W600
                 )
             }
-        }
+        },
+        backgroundColor = Color.LightGray.copy(0.3f),
     ) {
         Box(
             modifier = Modifier
@@ -88,9 +89,7 @@ private fun Success(
 ) {
     val conUiState = viewModel.conUiState.collectAsState()
     val myConsumption = viewModel.myConsumption.collectAsState()
-    Column(
-        modifier = Modifier.background(Color.LightGray.copy(0.3f))
-    ) {
+    Column {
         when (val data = conUiState.value) {
             UiState.Loading -> Box(modifier = Modifier.fillMaxSize()) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -392,6 +391,11 @@ private fun BillInfoView(
                 imageModel = bill.image,
                 contentDescription = null,
                 contentScale = ContentScale.FillWidth,
+                loading = {
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
             )
             consumptions?.forEach { item ->
                 ConsumptionItem(consumption = item, viewModel = viewModel)

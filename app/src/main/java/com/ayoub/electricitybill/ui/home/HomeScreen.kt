@@ -98,6 +98,7 @@ private fun Success(
             BillItem(bill = item) {
                 onBillDetails(item)
             }
+            Spacer(modifier = Modifier.height(14.dp))
         }
     }
 }

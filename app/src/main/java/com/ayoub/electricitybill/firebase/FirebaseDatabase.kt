@@ -98,7 +98,8 @@ class FirebaseDatabase @Inject constructor(
         onFail: () -> Unit,
     ) {
         val data = mutableListOf<Bill>()
-        database.child(billsRef).limitToLast(20).addChildEventListener(object: ChildEventListener {
+        val query = database.child(billsRef).orderByChild("createdAt")
+        query.limitToLast(20).addChildEventListener(object: ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 snapshot.getValue(Bill::class.java)?.let {
                     data.add(it)
