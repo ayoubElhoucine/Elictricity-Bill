@@ -4,9 +4,9 @@ import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ayoub.electricitybill.base.BaseViewModel
-import com.ayoub.electricitybill.firebase.FirebaseDatabase
-import com.ayoub.electricitybill.firebase.FirebaseUserAuth
-import com.ayoub.electricitybill.firebase.billsRef
+import com.ayoub.electricitybill.data.firebase.FirebaseDatabase
+import com.ayoub.electricitybill.data.firebase.FirebaseUserAuth
+import com.ayoub.electricitybill.data.firebase.billsRef
 import com.ayoub.electricitybill.model.Bill
 import com.ayoub.electricitybill.model.Consumer
 import com.ayoub.electricitybill.model.Consumption

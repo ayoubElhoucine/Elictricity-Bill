@@ -1,7 +1,7 @@
 package com.ayoub.electricitybill.ui.bill.details
 
 import com.ayoub.electricitybill.base.BaseViewModel
-import com.ayoub.electricitybill.firebase.FirebaseDatabase
+import com.ayoub.electricitybill.data.firebase.FirebaseDatabase
 import com.ayoub.electricitybill.model.Consumer
 import com.ayoub.electricitybill.ui.uiState.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel

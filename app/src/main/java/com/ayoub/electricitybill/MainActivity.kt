@@ -11,8 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.MutableLiveData
-import com.ayoub.electricitybill.firebase.FirebaseDatabase
-import com.ayoub.electricitybill.firebase.FirebaseUserAuth
+import com.ayoub.electricitybill.data.firebase.FirebaseDatabase
+import com.ayoub.electricitybill.data.firebase.FirebaseUserAuth
 import com.ayoub.electricitybill.ui.MyApp
 import com.ayoub.electricitybill.ui.theme.ElectricityBillTheme
 import dagger.hilt.android.AndroidEntryPoint

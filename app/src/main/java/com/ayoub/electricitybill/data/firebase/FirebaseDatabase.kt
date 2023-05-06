@@ -1,4 +1,4 @@
-package com.ayoub.electricitybill.firebase
+package com.ayoub.electricitybill.data.firebase
 
 import android.app.Application
 import android.net.Uri

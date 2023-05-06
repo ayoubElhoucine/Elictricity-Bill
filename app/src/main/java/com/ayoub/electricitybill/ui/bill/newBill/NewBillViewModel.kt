@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.net.Uri
 import com.ayoub.electricitybill.base.BaseViewModel
-import com.ayoub.electricitybill.firebase.FirebaseDatabase
+import com.ayoub.electricitybill.data.firebase.FirebaseDatabase
 import com.ayoub.electricitybill.model.Bill
 import com.ayoub.electricitybill.ui.uiState.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
