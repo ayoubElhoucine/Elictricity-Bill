@@ -36,6 +36,7 @@ import com.ayoub.electricitybill.extension.toNiceFormat
 import com.ayoub.electricitybill.model.Bill
 import com.ayoub.electricitybill.model.Consumer
 import com.ayoub.electricitybill.model.Consumption
+import com.ayoub.electricitybill.ui.common.LocalAdminRole
 import com.ayoub.electricitybill.ui.components.TileListItem
 import com.ayoub.electricitybill.ui.theme.Purple500
 import com.ayoub.electricitybill.ui.theme.Purple700
@@ -87,6 +88,7 @@ private fun Success(
     bill: Bill,
     onBack: () -> Unit,
 ) {
+    val isAdmin = LocalAdminRole.current
     val conUiState = viewModel.conUiState.collectAsState()
     val myConsumption = viewModel.myConsumption.collectAsState()
     Column {
@@ -106,8 +108,10 @@ private fun Success(
                         }
                         Spacer(modifier = Modifier.height(20.dp))
                         BillInfoView(bill = bill, consumptions = data.data as? List<Consumption>, viewModel = viewModel)
-                        (data.data as? List<Consumption>)?.let {
-                            Footer(viewModel = viewModel, consumptions = it, onBack = onBack)
+                        if (isAdmin) {
+                            (data.data as? List<Consumption>)?.let {
+                                Footer(viewModel = viewModel, consumptions = it, onBack = onBack)
+                            }
                         }
                     }
                 }
@@ -467,6 +471,7 @@ private fun ConsumptionItem(
     consumption: Consumption,
     viewModel: DraftBillViewModel,
 ) {
+    val isAdmin = LocalAdminRole.current
     val isPayed = remember { mutableStateOf(consumption.payed) }
     val consumer = remember { mutableStateOf<Consumer?>(null) }
     viewModel.getConsumerById(id = consumption.consumer) {
@@ -514,17 +519,19 @@ private fun ConsumptionItem(
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-        consumption.prevCounter?.let {
-            TileListItem(
-                title = "Ancien compteur",
-                value = it.toInt().toString()
-            )
-        }
-        consumption.currCounter.let {
-            TileListItem(
-                title = "Nouveau compteur",
-                value = it.toInt().toString()
-            )
+        if (isAdmin) {
+            consumption.prevCounter?.let {
+                TileListItem(
+                    title = "Ancien compteur",
+                    value = it.toInt().toString()
+                )
+            }
+            consumption.currCounter.let {
+                TileListItem(
+                    title = "Nouveau compteur",
+                    value = it.toInt().toString()
+                )
+            }
         }
         consumption.value?.let {
             TileListItem(
@@ -532,29 +539,31 @@ private fun ConsumptionItem(
                 value = it.toInt().toString()
             )
         }
-        consumption.cost?.let {
-            TileListItem(
-                title = "Prix:",
-                value = "${it.toNiceFormat()}DA"
-            )
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                modifier = Modifier.weight(1f),
-                text = "Payé",
-                color = Color.Black,
-                fontSize = 16.sp,
-            )
-            Switch(checked = isPayed.value, onCheckedChange = {
-                viewModel.togglePayed(
-                    id = consumption.id,
-                    value = it,
-                ) {
-                    isPayed.value = it
-                }
-            })
+        if (isAdmin) {
+            consumption.cost?.let {
+                TileListItem(
+                    title = "Prix:",
+                    value = "${it.toNiceFormat()}DA"
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = "Payé",
+                    color = Color.Black,
+                    fontSize = 16.sp,
+                )
+                Switch(checked = isPayed.value, onCheckedChange = {
+                    viewModel.togglePayed(
+                        id = consumption.id,
+                        value = it,
+                    ) {
+                        isPayed.value = it
+                    }
+                })
+            }
         }
     }
 }

@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ayoub.electricitybill.model.Bill
+import com.ayoub.electricitybill.ui.common.LocalAdminRole
 import com.ayoub.electricitybill.ui.theme.Purple700
 import com.ayoub.electricitybill.ui.uiState.UiState
 import com.skydoves.landscapist.glide.GlideImage
@@ -34,6 +35,7 @@ fun HomeScreen(
     onDraftedBill: () -> Unit,
     onBillDetails: (Bill) -> Unit,
 ) {
+    val isAdmin = LocalAdminRole.current
     LaunchedEffect(Unit) {
         viewModel.getDraftBill(onDraftedBill)
     }
@@ -53,15 +55,17 @@ fun HomeScreen(
             }
         },
         floatingActionButton = {
-            FloatingActionButton(
-                backgroundColor = Purple700,
-                onClick = onNewBill,
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = null,
-                    tint = Color.White
-                )
+            if (isAdmin) {
+                FloatingActionButton(
+                    backgroundColor = Purple700,
+                    onClick = onNewBill,
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                }
             }
         },
         backgroundColor = Color.LightGray.copy(0.3f),
