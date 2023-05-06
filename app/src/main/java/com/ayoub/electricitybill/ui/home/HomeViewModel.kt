@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import com.ayoub.electricitybill.base.BaseViewModel
 import com.ayoub.electricitybill.firebase.FirebaseDatabase
+import com.ayoub.electricitybill.firebase.FirebaseUserAuth
 import com.ayoub.electricitybill.model.Bill
 import com.ayoub.electricitybill.ui.uiState.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,12 +16,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val application: Application,
     private val firebaseDatabase: FirebaseDatabase,
+    private val firebaseUserAuth: FirebaseUserAuth,
 ): BaseViewModel<UiState>() {
 
     init {
         getBills()
+        updateFcmToken()
     }
 
     private fun getBills() {
@@ -33,6 +35,12 @@ class HomeViewModel @Inject constructor(
                 _uiState.value = UiState.Fail()
             }
         )
+    }
+
+    private fun updateFcmToken() {
+        firebaseUserAuth.getUser()?.let {
+            firebaseDatabase.updateFcmToken(it.uid)
+        }
     }
 
     fun getDraftBill(onBillDetails: () -> Unit) {

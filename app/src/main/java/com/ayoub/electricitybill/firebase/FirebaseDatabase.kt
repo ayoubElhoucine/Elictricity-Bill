@@ -9,6 +9,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.ktx.storage
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -203,6 +204,22 @@ class FirebaseDatabase @Inject constructor(
             }
             override fun onCancelled(error: DatabaseError) { onFail() }
         })
+    }
+
+    fun updateFcmToken(id: String) {
+        FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
+            val query: Query = database.child(consumersRef).orderByChild("id").equalTo(id)
+            query.addListenerForSingleValueEvent(object: ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        snapshot.children.forEach {
+                            it.ref.child("token").setValue(token)
+                        }
+                    }
+                }
+                override fun onCancelled(error: DatabaseError) { }
+            })
+        }
     }
 
     fun uploadBillImage(
