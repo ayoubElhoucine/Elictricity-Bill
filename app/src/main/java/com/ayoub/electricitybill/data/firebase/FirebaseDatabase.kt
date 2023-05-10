@@ -122,6 +122,33 @@ class FirebaseDatabase @Inject constructor(
         })
     }
 
+    fun getConsumers(
+        onFail: (() -> Unit)? = null,
+        onSuccess: (List<Consumer>) -> Unit,
+    ) {
+        val data = mutableListOf<Consumer>()
+        database.child(consumersRef).addChildEventListener(object: ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                snapshot.getValue(Consumer::class.java)?.let {
+                    data.add(it)
+                    onSuccess(data)
+                } ?: run {
+                    onFail?.invoke()
+                }
+            }
+            override fun onCancelled(error: DatabaseError) { onFail?.invoke() }
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onChildRemoved(snapshot: DataSnapshot) {}
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+        })
+        database.child(billsRef).addValueEventListener(object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (!snapshot.exists()) onFail?.invoke()
+            }
+            override fun onCancelled(error: DatabaseError) { onFail?.invoke() }
+        })
+    }
+
     fun getConsumerById(
         id: String,
         onComplete: (Consumer?) -> Unit,

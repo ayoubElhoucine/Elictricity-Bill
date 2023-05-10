@@ -20,22 +20,11 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val firebaseDatabase: FirebaseDatabase,
     private val firebaseUserAuth: FirebaseUserAuth,
-    private val repo: ApiRepo,
 ): BaseViewModel<UiState>() {
 
     init {
         getBills()
         updateFcmToken()
-        viewModelScope.launch {
-            delay(1000)
-            repo.pushNotification(
-                BodyRequest(
-                    to = "dmj7itRKQ3Sp59mC3NVr90:APA91bGpE9_jE0AtvjvLp-2a6-_o2CV7PCFrYoabN7xNbGk4py-aVxt7dGmAEeCg-QvqYtuzfgy9bMFnn1JcbXBA9cmopCH_4xbM8WORp6E_50z4-HCvAvi3CjyqlSfQsDYHLN1ZgywV",
-                    notification = NotificationRequest(),
-                    data = DataRequest()
-                )
-            )
-        }
     }
 
     private fun getBills() {
