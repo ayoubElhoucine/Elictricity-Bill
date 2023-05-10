@@ -1,5 +1,6 @@
 package com.ayoub.electricitybill.ui.home
 
+import android.provider.ContactsContract.Data
 import androidx.lifecycle.viewModelScope
 import com.ayoub.electricitybill.base.BaseViewModel
 import com.ayoub.electricitybill.data.firebase.FirebaseDatabase
@@ -7,6 +8,7 @@ import com.ayoub.electricitybill.data.firebase.FirebaseUserAuth
 import com.ayoub.electricitybill.data.network.Api
 import com.ayoub.electricitybill.data.repo.ApiRepo
 import com.ayoub.electricitybill.data.request.BodyRequest
+import com.ayoub.electricitybill.data.request.DataRequest
 import com.ayoub.electricitybill.data.request.NotificationRequest
 import com.ayoub.electricitybill.ui.uiState.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,8 +30,9 @@ class HomeViewModel @Inject constructor(
             delay(1000)
             repo.pushNotification(
                 BodyRequest(
-                    to = "eT3McPoZR-ecZVAusj0FoB:APA91bGJutJyEqb3DZrgP-WV81UukALuS1nQAS4QHBq8J3nq17AdsY0387yUORbh9rjWwWjTHF3al8KY9ud5lobuJurqgQ_LLMlP901Kq8714C09lzJyuj3B0DucVEKXcZf1xjHnooTy",
-                    notification = NotificationRequest()
+                    to = "dmj7itRKQ3Sp59mC3NVr90:APA91bGpE9_jE0AtvjvLp-2a6-_o2CV7PCFrYoabN7xNbGk4py-aVxt7dGmAEeCg-QvqYtuzfgy9bMFnn1JcbXBA9cmopCH_4xbM8WORp6E_50z4-HCvAvi3CjyqlSfQsDYHLN1ZgywV",
+                    notification = NotificationRequest(),
+                    data = DataRequest()
                 )
             )
         }
