@@ -38,8 +38,13 @@ class NewBillViewModel @Inject constructor(
     val context: Context get () = application.applicationContext
     private var billImage: String? = null
 
+    private var consumers: List<Consumer>? = null
+
     init {
         _uiState.value = UiState.Idle
+        firebaseDatabase.getConsumers {
+            consumers = it
+        }
     }
 
     fun createDraftBill(amount: Double, extra: Double) {
@@ -56,22 +61,21 @@ class NewBillViewModel @Inject constructor(
             firebaseDatabase.createDraftBill(
                 bill = bill,
                 onSuccess = {
-                    firebaseDatabase.getConsumers { cos ->
-                        viewModelScope.launch(Dispatchers.IO) {
-                            cos.forEach {
-                                repo.pushNotification(
-                                    body = BodyRequest(
-                                        to = it.token,
-                                        notification = NotificationRequest(
-                                            title = "Nouvelle facture 🚨",
-                                            body = "Nouvelle facture arrivée 👀🚨💡"
-                                        ),
-                                        data = DataRequest(),
-                                    )
+                    viewModelScope.launch(Dispatchers.IO) {
+                        consumers?.forEach {
+                            repo.pushNotification(
+                                body = BodyRequest(
+                                    to = it.token,
+                                    notification = NotificationRequest(
+                                        title = "Nouvelle facture 🚨",
+                                        body = "Nouvelle facture arrivée 👀🚨💡"
+                                    ),
+                                    data = DataRequest(),
                                 )
-                                delay(100)
-                            }
+                            )
+                            delay(100)
                         }
+                        _uiState.value = UiState.Success()
                     }
                 },
                 onFail = {
